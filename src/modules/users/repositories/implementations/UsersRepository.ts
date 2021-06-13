@@ -1,8 +1,8 @@
-import { getRepository, Repository } from 'typeorm';
-
-import { IFindUserWithGamesDTO, IFindUserByFullNameDTO } from '../../dtos';
+import { getRepository, ILike, Repository } from 'typeorm';
+import { IFindUserByFullNameDTO, IFindUserWithGamesDTO } from '../../dtos';
 import { User } from '../../entities/User';
 import { IUsersRepository } from '../IUsersRepository';
+
 
 export class UsersRepository implements IUsersRepository {
   private repository: Repository<User>;
@@ -35,6 +35,12 @@ export class UsersRepository implements IUsersRepository {
     first_name,
     last_name,
   }: IFindUserByFullNameDTO): Promise<User[] | undefined> {
-    return this.repository.query(); // Complete usando raw query
+    const users = await this.repository.find({
+      where: {
+        first_name: ILike(`%${first_name}%`),
+        last_name: ILike(`%${last_name}%`)
+      }
+    });
+    return users;
   }
 }
